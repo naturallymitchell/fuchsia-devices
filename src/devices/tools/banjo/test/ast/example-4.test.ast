@@ -1,0 +1,87 @@
+BanjoAst {
+    primary_namespace: "banjo.examples.example4",
+    namespaces: {
+        "banjo.examples.example4": [
+            Struct {
+                attributes: Attrs(
+                    [],
+                ),
+                name: Ident {
+                    namespace: Some(
+                        "banjo.examples.example4",
+                    ),
+                    name: "Point",
+                },
+                fields: [
+                    StructField {
+                        attributes: Attrs(
+                            [],
+                        ),
+                        ty: UInt64,
+                        ident: Ident {
+                            namespace: None,
+                            name: "x",
+                        },
+                        val: None,
+                    },
+                ],
+            },
+            Enum {
+                attributes: Attrs(
+                    [],
+                ),
+                name: Ident {
+                    namespace: Some(
+                        "banjo.examples.example4",
+                    ),
+                    name: "Enum",
+                },
+                ty: UInt32,
+                variants: [
+                    EnumVariant {
+                        attributes: Attrs(
+                            [],
+                        ),
+                        name: "x",
+                        value: Constant(
+                            "23",
+                        ),
+                    },
+                ],
+            },
+            Protocol {
+                attributes: Attrs(
+                    [
+                        Attr {
+                            key: "Layout",
+                            val: Some(
+                                "ddk-protocol",
+                            ),
+                        },
+                    ],
+                ),
+                name: Ident {
+                    namespace: Some(
+                        "banjo.examples.example4",
+                    ),
+                    name: "Interface",
+                },
+                methods: [
+                    Method {
+                        attributes: Attrs(
+                            [],
+                        ),
+                        name: "func",
+                        in_params: [
+                            (
+                                "x",
+                                Bool,
+                            ),
+                        ],
+                        out_params: [],
+                    },
+                ],
+            },
+        ],
+    },
+}

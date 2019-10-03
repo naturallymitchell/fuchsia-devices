@@ -1,0 +1,130 @@
+BanjoAst {
+    primary_namespace: "banjo.examples.tables",
+    namespaces: {
+        "banjo.examples.tables": [
+            Struct {
+                attributes: Attrs(
+                    [],
+                ),
+                name: Ident {
+                    namespace: Some(
+                        "banjo.examples.tables",
+                    ),
+                    name: "A",
+                },
+                fields: [
+                    StructField {
+                        attributes: Attrs(
+                            [],
+                        ),
+                        ty: Identifier {
+                            id: Ident {
+                                namespace: Some(
+                                    "banjo.examples.tables",
+                                ),
+                                name: "B",
+                            },
+                            reference: true,
+                        },
+                        ident: Ident {
+                            namespace: None,
+                            name: "foo",
+                        },
+                        val: None,
+                    },
+                ],
+            },
+            Struct {
+                attributes: Attrs(
+                    [],
+                ),
+                name: Ident {
+                    namespace: Some(
+                        "banjo.examples.tables",
+                    ),
+                    name: "B",
+                },
+                fields: [
+                    StructField {
+                        attributes: Attrs(
+                            [],
+                        ),
+                        ty: Identifier {
+                            id: Ident {
+                                namespace: Some(
+                                    "banjo.examples.tables",
+                                ),
+                                name: "A",
+                            },
+                            reference: true,
+                        },
+                        ident: Ident {
+                            namespace: None,
+                            name: "bar",
+                        },
+                        val: None,
+                    },
+                ],
+            },
+            Struct {
+                attributes: Attrs(
+                    [],
+                ),
+                name: Ident {
+                    namespace: Some(
+                        "banjo.examples.tables",
+                    ),
+                    name: "C",
+                },
+                fields: [
+                    StructField {
+                        attributes: Attrs(
+                            [],
+                        ),
+                        ty: Handle {
+                            ty: Handle,
+                            reference: false,
+                        },
+                        ident: Ident {
+                            namespace: None,
+                            name: "baz",
+                        },
+                        val: None,
+                    },
+                ],
+            },
+            Struct {
+                attributes: Attrs(
+                    [],
+                ),
+                name: Ident {
+                    namespace: Some(
+                        "banjo.examples.tables",
+                    ),
+                    name: "D",
+                },
+                fields: [
+                    StructField {
+                        attributes: Attrs(
+                            [],
+                        ),
+                        ty: Identifier {
+                            id: Ident {
+                                namespace: Some(
+                                    "banjo.examples.tables",
+                                ),
+                                name: "C",
+                            },
+                            reference: false,
+                        },
+                        ident: Ident {
+                            namespace: None,
+                            name: "qux",
+                        },
+                        val: None,
+                    },
+                ],
+            },
+        ],
+    },
+}

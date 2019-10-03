@@ -1,0 +1,66 @@
+BanjoAst {
+    primary_namespace: "banjo.examples.example6",
+    namespaces: {
+        "banjo.examples.example6": [
+            Constant {
+                attributes: Attrs(
+                    [],
+                ),
+                name: Ident {
+                    namespace: Some(
+                        "banjo.examples.example6",
+                    ),
+                    name: "x",
+                },
+                ty: Int32,
+                value: Constant(
+                    "23",
+                ),
+            },
+            Protocol {
+                attributes: Attrs(
+                    [
+                        Attr {
+                            key: "Layout",
+                            val: Some(
+                                "ddk-protocol",
+                            ),
+                        },
+                    ],
+                ),
+                name: Ident {
+                    namespace: Some(
+                        "banjo.examples.example6",
+                    ),
+                    name: "Hello",
+                },
+                methods: [
+                    Method {
+                        attributes: Attrs(
+                            [],
+                        ),
+                        name: "Say",
+                        in_params: [
+                            (
+                                "req",
+                                Str {
+                                    size: None,
+                                    nullable: false,
+                                },
+                            ),
+                        ],
+                        out_params: [
+                            (
+                                "response",
+                                Str {
+                                    size: None,
+                                    nullable: false,
+                                },
+                            ),
+                        ],
+                    },
+                ],
+            },
+        ],
+    },
+}

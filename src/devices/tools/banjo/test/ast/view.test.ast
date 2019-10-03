@@ -1,0 +1,85 @@
+BanjoAst {
+    primary_namespace: "banjo.examples.libraryb",
+    namespaces: {
+        "banjo.examples.librarya": [
+            Struct {
+                attributes: Attrs(
+                    [],
+                ),
+                name: Ident {
+                    namespace: Some(
+                        "banjo.examples.librarya",
+                    ),
+                    name: "Point",
+                },
+                fields: [
+                    StructField {
+                        attributes: Attrs(
+                            [],
+                        ),
+                        ty: Float32,
+                        ident: Ident {
+                            namespace: None,
+                            name: "x",
+                        },
+                        val: None,
+                    },
+                    StructField {
+                        attributes: Attrs(
+                            [],
+                        ),
+                        ty: Float32,
+                        ident: Ident {
+                            namespace: None,
+                            name: "y",
+                        },
+                        val: None,
+                    },
+                ],
+            },
+        ],
+        "banjo.examples.libraryb": [
+            Protocol {
+                attributes: Attrs(
+                    [
+                        Attr {
+                            key: "Layout",
+                            val: Some(
+                                "ddk-protocol",
+                            ),
+                        },
+                    ],
+                ),
+                name: Ident {
+                    namespace: Some(
+                        "banjo.examples.libraryb",
+                    ),
+                    name: "View",
+                },
+                methods: [
+                    Method {
+                        attributes: Attrs(
+                            [],
+                        ),
+                        name: "MoveTo",
+                        in_params: [
+                            (
+                                "p",
+                                Identifier {
+                                    id: Ident {
+                                        namespace: Some(
+                                            "banjo.examples.librarya",
+                                        ),
+                                        name: "Point",
+                                    },
+                                    reference: false,
+                                },
+                            ),
+                        ],
+                        out_params: [],
+                    },
+                ],
+            },
+        ],
+    },
+}
