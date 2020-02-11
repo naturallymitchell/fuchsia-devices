@@ -1,0 +1,56 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+##########################################
+# Though under //zircon, this build file #
+# is meant to be used in the Fuchsia GN  #
+# build.                                 #
+# See fxb/36139.                         #
+##########################################
+
+assert(!defined(zx) || zx != "/",
+       "This file can only be used in the Fuchsia GN build.")
+
+import("//build/config/fuchsia/rules.gni")
+import("//build/unification/images/migrated_manifest.gni")
+
+driver_module("usb-peripheral") {
+  defines = [ "_ALL_SOURCE" ]
+  configs += [ "//build/config/fuchsia:enable_zircon_asserts" ]
+  configs -= [ "//build/config/fuchsia:no_cpp_standard_library" ]
+  configs += [ "//build/config/fuchsia:static_cpp_standard_library" ]
+  configs += [ "//build/unification/config:zircon-migrated" ]
+  sources = [
+    "usb-function.cc",
+    "usb-peripheral.cc",
+  ]
+  deps = [
+    "//sdk/banjo/ddk.protocol.usb.dci",
+    "//sdk/banjo/ddk.protocol.usb.function",
+    "//src/devices/lib/driver",
+    "//zircon/public/lib/ddk",
+    "//zircon/public/lib/ddktl",
+    "//zircon/public/lib/fbl",
+    "//zircon/public/lib/fidl",
+    "//zircon/public/lib/usb",
+    "//zircon/system/banjo/ddk.protocol.usb",
+    "//zircon/system/banjo/ddk.protocol.usb.modeswitch",
+    "//zircon/system/banjo/ddk.protocol.usb.request",
+    "//zircon/system/fidl/fuchsia-hardware-usb-peripheral:llcpp",
+  ]
+
+  # Set default configuration here, rather than relying on usbctl to do it.
+  defines += [
+    "USB_DEVICE_VID=0x18D1",
+    "USB_DEVICE_PID=0xA020",
+    "USB_DEVICE_MANUFACTURER=\"Zircon\"",
+    "USB_DEVICE_PRODUCT=\"CDC-Ethernet\"",
+    "USB_DEVICE_SERIAL=\"0123456789ABCDEF\"",
+    "USB_DEVICE_FUNCTIONS=\"cdc\"",
+  ]
+}
+
+migrated_manifest("usb-peripheral-manifest") {
+  deps = [ ":usb-peripheral" ]
+}

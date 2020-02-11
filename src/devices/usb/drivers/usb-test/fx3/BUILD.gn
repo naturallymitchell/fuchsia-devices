@@ -1,0 +1,51 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+##########################################
+# Though under //zircon, this build file #
+# is meant to be used in the Fuchsia GN  #
+# build.                                 #
+# See fxb/36139.                         #
+##########################################
+
+assert(!defined(zx) || zx != "/",
+       "This file can only be used in the Fuchsia GN build.")
+
+import("//build/config/fuchsia/rules.gni")
+import("//build/unification/firmware.gni")
+import("//build/unification/images/migrated_manifest.gni")
+
+driver_module("fx3") {  # TODO: test_driver?
+  defines = [ "_ALL_SOURCE" ]
+  configs += [ "//build/config/fuchsia:enable_zircon_asserts" ]
+  configs -= [ "//build/config/fuchsia:no_cpp_standard_library" ]
+  configs += [ "//build/config/fuchsia:static_cpp_standard_library" ]
+  configs += [ "//build/unification/config:zircon-migrated" ]
+
+  # TODO(44278): Restore testonly marker post-migration.
+  testonly = false
+  sources = [ "fx3.c" ]
+  deps = [
+    "//sdk/fidl/fuchsia.hardware.usb.fwloader:fuchsia.hardware.usb.fwloader_c",
+    "//src/devices/lib/driver",
+    "//zircon/public/lib/ddk",
+    "//zircon/public/lib/usb",
+    "//zircon/system/banjo/ddk.protocol.usb",
+    "//zircon/system/banjo/ddk.protocol.usb.composite",
+    "//zircon/system/banjo/ddk.protocol.usb.request",
+    "//zircon/system/fidl/fuchsia-mem:c",
+  ]
+  data_deps = [ ":firmware" ]
+}
+
+firmware("firmware") {
+  sources = [
+    "fx3-flash/cyfxflashprog.img",
+    "usb-testing/fx3/fx3.img",
+  ]
+}
+
+migrated_manifest("fx3-manifest") {
+  deps = [ ":fx3" ]
+}
