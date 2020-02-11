@@ -1,0 +1,66 @@
+// Copyright 2019 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+#ifndef ZIRCON_SYSTEM_DEV_SYSMEM_SYSMEM_CONTIGUOUS_POOLED_MEMORY_ALLOCATOR_H_
+#define ZIRCON_SYSTEM_DEV_SYSMEM_SYSMEM_CONTIGUOUS_POOLED_MEMORY_ALLOCATOR_H_
+
+#include <lib/zx/bti.h>
+#include <zircon/limits.h>
+
+#include <fbl/vector.h>
+#include <region-alloc/region-alloc.h>
+
+#include "allocator.h"
+
+namespace sysmem_driver {
+
+class ContiguousPooledMemoryAllocator : public MemoryAllocator {
+ public:
+  ContiguousPooledMemoryAllocator(Owner* parent_device, const char* allocation_name, uint64_t size,
+                                  bool is_cpu_accessible, bool is_ready);
+
+  // Default to page alignment.
+  zx_status_t Init(uint32_t alignment_log2 = ZX_PAGE_SHIFT);
+
+  // TODO(MTWN-329): Use this for VDEC.
+  //
+  // This uses a physical VMO as the parent VMO.
+  zx_status_t InitPhysical(zx_paddr_t paddr);
+
+  zx_status_t Allocate(uint64_t size, zx::vmo* parent_vmo) override;
+  zx_status_t SetupChildVmo(const zx::vmo& parent_vmo, const zx::vmo& child_vmo) override;
+  void Delete(zx::vmo parent_vmo) override;
+
+  bool CoherencyDomainIsInaccessible() override { return !is_cpu_accessible_; }
+
+  zx_status_t GetPhysicalMemoryInfo(uint64_t* base, uint64_t* size) override {
+    *base = start_;
+    *size = size_;
+    return ZX_OK;
+  }
+
+  void set_ready() override;
+  bool is_ready() override;
+
+  const zx::vmo& GetPoolVmoForTest() { return contiguous_vmo_; }
+
+ private:
+  zx_status_t InitCommon(zx::vmo local_contiguous_vmo);
+  void DumpPoolStats();
+  Owner* const parent_device_{};
+  const char* const allocation_name_{};
+  char child_name_[ZX_MAX_NAME_LEN] = {};
+  zx::vmo contiguous_vmo_;
+  RegionAllocator region_allocator_;
+  // From parent_vmo handle to std::unique_ptr<>
+  std::map<zx_handle_t, RegionAllocator::Region::UPtr> regions_;
+  uint64_t start_{};
+  uint64_t size_{};
+  bool is_cpu_accessible_{};
+  bool is_ready_{};
+};
+
+}  // namespace sysmem_driver
+
+#endif  // ZIRCON_SYSTEM_DEV_SYSMEM_SYSMEM_CONTIGUOUS_POOLED_MEMORY_ALLOCATOR_H_
