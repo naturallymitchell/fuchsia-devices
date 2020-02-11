@@ -1,0 +1,29 @@
+// Copyright 2019 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+library fuchsia.device.lifecycle.test;
+
+using zx;
+
+protocol TestDevice {
+    /// Adds a child device and returns a unique |id| for the created device.
+    /// |complete_init| specifies whether the init hook should be replied to immediately,
+    /// or completed later by the caller with |CompleteChildInit|.
+    AddChild(bool init_complete, zx.status init_status) -> (uint64 child_id) error zx.status;
+
+    /// Removes the child device of the given |id|.
+    RemoveChild(uint64 child_id) -> () error zx.status;
+
+    /// Replies to the child init hook.
+    /// Returns an error if the child has no pending init.
+    CompleteChildInit(uint64 child_id) -> () error zx.status;
+
+    /// Registers the client for device lifecycle events.
+    SubscribeToLifecycle(request<Lifecycle> client) -> () error zx.status;
+};
+
+protocol Lifecycle {
+    /// Sent when the ChildPreRelease hook is called.
+    -> OnChildPreRelease(uint64 child_id);
+};

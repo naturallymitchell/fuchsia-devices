@@ -1,0 +1,98 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+##########################################
+# Though under //zircon, this build file #
+# is meant to be used in the Fuchsia GN  #
+# build.                                 #
+# See fxb/36139.                         #
+##########################################
+
+assert(!defined(zx) || zx != "/",
+       "This file can only be used in the Fuchsia GN build.")
+
+import("//build/config/fuchsia/rules.gni")
+import("//build/fidl/fidl.gni")
+import("//build/unification/images/migrated_manifest.gni")
+
+fidl("fuchsia.device.devhost.test") {
+  #visibility = [ ":*" ]
+  sources = [ "test.fidl" ]
+}
+
+driver_module("devhost-test") {
+  defines = [ "_ALL_SOURCE" ]
+  configs += [ "//build/config/fuchsia:enable_zircon_asserts" ]
+  configs -= [ "//build/config/fuchsia:no_cpp_standard_library" ]
+  configs += [ "//build/config/fuchsia:static_cpp_standard_library" ]
+  configs += [ "//build/unification/config:zircon-migrated" ]
+  sources = [ "test-driver.cc" ]
+  deps = [
+    ":fuchsia.device.devhost.test_llcpp",
+    "//src/devices/lib/driver",
+    "//zircon/public/lib/ddk",
+    "//zircon/public/lib/ddktl",
+    "//zircon/public/lib/fdio",
+  ]
+
+  # TODO(ZX-2863): This driver violates the allowed shlib deps policy.
+  # Tests fail when using #"//zircon/public/lib/fdio:static",
+  #deprecated_inhibit_driver_shlib_allowlist = true
+}
+
+driver_module("devhost-test-manual") {
+  defines = [ "_ALL_SOURCE" ]
+  configs += [ "//build/config/fuchsia:enable_zircon_asserts" ]
+  configs -= [ "//build/config/fuchsia:no_cpp_standard_library" ]
+  configs += [ "//build/config/fuchsia:static_cpp_standard_library" ]
+  configs += [ "//build/unification/config:zircon-migrated" ]
+  sources = [ "test-driver-manual-bind.cc" ]
+  deps = [
+    ":fuchsia.device.devhost.test_llcpp",
+    "//src/devices/lib/driver",
+    "//zircon/public/lib/ddk",
+    "//zircon/public/lib/ddktl",
+    "//zircon/public/lib/fdio",
+  ]
+
+  # TODO(ZX-2863): This driver violates the allowed shlib deps policy.
+  # Tests fail when using #"//zircon/public/lib/fdio:static",
+  #deprecated_inhibit_driver_shlib_allowlist = true
+}
+
+driver_module("devhost-test-child") {
+  defines = [ "_ALL_SOURCE" ]
+  configs += [ "//build/config/fuchsia:enable_zircon_asserts" ]
+  configs -= [ "//build/config/fuchsia:no_cpp_standard_library" ]
+  configs += [ "//build/config/fuchsia:static_cpp_standard_library" ]
+  configs += [ "//build/unification/config:zircon-migrated" ]
+  sources = [ "test-driver-child.cc" ]
+  deps = [
+    "//src/devices/lib/driver",
+    "//zircon/public/lib/ddk",
+    "//zircon/public/lib/ddktl",
+    "//zircon/public/lib/fdio",
+  ]
+
+  # TODO(ZX-2863): This driver violates the allowed shlib deps policy.
+  #deprecated_inhibit_driver_shlib_allowlist = true
+}
+
+migrated_manifest("devhost-test-manifest") {
+  deps = [
+    ":devhost-test",
+  ]
+}
+
+migrated_manifest("devhost-test-manual-manifest") {
+  deps = [
+    ":devhost-test-manual",
+  ]
+}
+
+migrated_manifest("devhost-test-child-manifest") {
+  deps = [
+    ":devhost-test-child",
+  ]
+}
