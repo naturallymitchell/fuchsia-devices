@@ -1,0 +1,141 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/fuchsia/rules.gni")
+import("//build/unification/images/migrated_manifest.gni")
+import("pci.gni")
+
+group("pci") {
+  deps = [
+    ":bus-pci",
+    ":bus-pci.proxy",
+  ]
+}
+
+# The userspace PCI bus driver uses this set, as well as the
+# automated tests.
+source_set("user_pci") {
+  visibility = [
+    ":*",
+    "test/:*",
+  ]
+
+  sources = [
+    "allocation.cc",
+    "bridge.cc",
+    "bus.cc",
+    "capabilities.cc",
+    "config.cc",
+    "device.cc",
+    "device_caps.cc",
+    "device_protocol.cc",
+    "upstream_node.cc",
+  ]
+  public_deps = [
+    "//zircon/public/lib/ddk",
+    "//zircon/public/lib/ddktl",
+    "//zircon/public/lib/fbl",
+    "//zircon/public/lib/hwreg",
+    "//zircon/public/lib/pretty",
+    "//zircon/public/lib/region-alloc",
+    "//zircon/public/lib/zircon-internal",
+    "//zircon/public/lib/zx",
+    "//zircon/system/banjo/ddk.protocol.pci",
+    "//zircon/system/banjo/ddk.protocol.pciroot",
+
+    # TODO(ZX-4062): This shouldn't be here if the mmio code is actually
+    # used in the test too.  Anything using that needs to be separately
+    # compiled for the test using the mock version.
+    "//zircon/public/lib/mmio",
+  ]
+}
+
+source_set("user_pci.proxy") {
+  sources = [ "device_proxy.cc" ]
+  public_deps = [
+    "//src/devices/lib/driver",
+    "//zircon/public/lib/ddk",
+    "//zircon/public/lib/ddktl",
+    "//zircon/public/lib/hwreg",
+    "//zircon/public/lib/pretty",
+    "//zircon/system/banjo/ddk.protocol.pci",
+  ]
+}
+
+if (enable_user_pci) {
+  driver_module("bus-pci") {
+    defines = [ "_ALL_SOURCE" ]
+    configs += [ "//build/config/fuchsia:enable_zircon_asserts" ]
+    configs -= [ "//build/config/fuchsia:no_cpp_standard_library" ]
+    configs += [ "//build/config/fuchsia:static_cpp_standard_library" ]
+    if (is_fuchsia) {
+      configs += [ "//build/unification/config:zircon-migrated" ]
+    }
+    sources = [
+      # The driver needs bind glue, unlike tests.
+      "bind.cc",
+    ]
+    deps = [ ":user_pci" ]
+  }
+
+  driver_module("bus-pci.proxy") {
+    defines = [ "_ALL_SOURCE" ]
+    configs += [ "//build/config/fuchsia:enable_zircon_asserts" ]
+    configs -= [ "//build/config/fuchsia:no_cpp_standard_library" ]
+    configs += [ "//build/config/fuchsia:static_cpp_standard_library" ]
+    if (is_fuchsia) {
+      configs += [ "//build/unification/config:zircon-migrated" ]
+    }
+    deps = [ ":user_pci.proxy" ]
+  }
+} else {
+  driver_module("bus-pci") {
+    defines = [ "_ALL_SOURCE" ]
+    configs += [ "//build/config/fuchsia:enable_zircon_asserts" ]
+    configs -= [ "//build/config/fuchsia:no_cpp_standard_library" ]
+    configs += [ "//build/config/fuchsia:static_cpp_standard_library" ]
+    if (is_fuchsia) {
+      configs += [ "//build/unification/config:zircon-migrated" ]
+    }
+    sources = [ "kpci/kpci.c" ]
+    deps = [
+      "//src/devices/lib/driver",
+      "//zircon/public/lib/ddk",
+      "//zircon/public/lib/ddktl",
+      "//zircon/public/lib/fidl",
+      "//zircon/system/banjo/ddk.protocol.pci",
+      "//zircon/system/banjo/ddk.protocol.pciroot",
+      "//zircon/system/banjo/ddk.protocol.platform.device",
+      "//zircon/system/banjo/ddk.protocol.sysmem",
+    ]
+  }
+
+  driver_module("bus-pci.proxy") {
+    defines = [ "_ALL_SOURCE" ]
+    configs += [ "//build/config/fuchsia:enable_zircon_asserts" ]
+    configs -= [ "//build/config/fuchsia:no_cpp_standard_library" ]
+    configs += [ "//build/config/fuchsia:static_cpp_standard_library" ]
+    if (is_fuchsia) {
+      configs += [ "//build/unification/config:zircon-migrated" ]
+    }
+    sources = [ "kpci/proxy.c" ]
+    deps = [
+      "//src/devices/lib/driver",
+      "//zircon/public/lib/ddk",
+      "//zircon/public/lib/ddktl",
+      "//zircon/system/banjo/ddk.protocol.pci",
+      "//zircon/system/banjo/ddk.protocol.pciroot",
+      "//zircon/system/banjo/ddk.protocol.platform.device",
+      "//zircon/system/banjo/ddk.protocol.sysmem",
+    ]
+  }
+}
+
+migrated_manifest("bus-pci-manifest") {
+  deps = [ ":bus-pci" ]
+}
+
+migrated_manifest("bus-pci.proxy-manifest") {
+  deps = [ ":bus-pci.proxy" ]
+}
