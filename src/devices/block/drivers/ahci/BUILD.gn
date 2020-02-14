@@ -1,0 +1,76 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/fuchsia/rules.gni")
+import("//build/test.gni")
+import("//build/unification/images/migrated_manifest.gni")
+
+driver_module("ahci") {
+  defines = [ "_ALL_SOURCE" ]
+  configs += [ "//build/config/fuchsia:enable_zircon_asserts" ]
+  configs -= [ "//build/config/fuchsia:no_cpp_standard_library" ]
+  configs += [ "//build/config/fuchsia:static_cpp_standard_library" ]
+  configs += [ "//build/unification/config:zircon-migrated" ]
+  deps = [
+    ":shared",
+    "//src/devices/lib/driver",
+  ]
+}
+
+group("test") {
+  testonly = true
+  deps = [ ":ahci-unittest" ]
+}
+
+test("ahci-unittest") {
+  # Dependent manifests unfortunately cannot be marked as `testonly`.
+  # Remove when converting this file to proper GN build idioms.
+  testonly = false
+  configs += [ "//build/unification/config:zircon-migrated" ]
+  output_name = "ahci-unittest"
+  sources = [
+    "test/fake-bus.cc",
+    "test/main.cc",
+  ]
+  deps = [
+    ":shared",
+    "//zircon/public/lib/ddk",
+    "//zircon/public/lib/ddktl",
+    "//zircon/public/lib/fake-bti",
+    "//zircon/public/lib/fake_ddk",
+    "//zircon/public/lib/sync",
+    "//zircon/public/lib/zxtest",
+    "//zircon/system/banjo/ddk.protocol.block",
+  ]
+}
+
+source_set("shared") {
+  visibility = [ "./*" ]
+  defines = [ "_ALL_SOURCE" ]
+  sources = [
+    "bus.cc",
+    "controller.cc",
+    "pci-bus.cc",
+    "port.cc",
+    "sata.cc",
+  ]
+  deps = [
+    "//zircon/public/lib/ddk",
+    "//zircon/public/lib/device-protocol-pci",
+    "//zircon/public/lib/fbl",
+    "//zircon/public/lib/mmio",
+    "//zircon/public/lib/sync",
+    "//zircon/public/lib/zx",
+    "//zircon/system/banjo/ddk.protocol.block",
+    "//zircon/system/banjo/ddk.protocol.pci",
+  ]
+}
+
+migrated_manifest("ahci-manifest") {
+  deps = [ ":ahci" ]
+}
+
+migrated_manifest("ahci-unittest-manifest") {
+  deps = [ ":ahci-unittest" ]
+}

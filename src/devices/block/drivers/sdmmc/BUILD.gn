@@ -1,0 +1,87 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/fuchsia/rules.gni")
+import("//build/test.gni")
+import("//build/unification/images/migrated_manifest.gni")
+
+driver_module("sdmmc") {
+  defines = [ "_ALL_SOURCE" ]
+  configs += [ "//build/config/fuchsia:enable_zircon_asserts" ]
+  configs -= [ "//build/config/fuchsia:no_cpp_standard_library" ]
+  configs += [ "//build/config/fuchsia:static_cpp_standard_library" ]
+  configs += [ "//build/unification/config:zircon-migrated" ]
+  sources = [
+    "mmc.cc",
+    "sd.cc",
+    "sdio-controller-device.cc",
+    "sdio-function-device.cc",
+    "sdmmc-block-device.cc",
+    "sdmmc-device.cc",
+    "sdmmc-root-device.cc",
+  ]
+  deps = [
+    "//sdk/banjo/ddk.protocol.block.partition",
+    "//sdk/banjo/ddk.protocol.sdio",
+    "//sdk/banjo/ddk.protocol.sdmmc",
+    "//src/devices/lib/driver",
+    "//zircon/public/lib/ddk",
+    "//zircon/public/lib/ddktl",
+    "//zircon/public/lib/dev-operation",
+    "//zircon/public/lib/fdio",
+    "//zircon/public/lib/fzl",
+    "//zircon/public/lib/pretty",
+    "//zircon/public/lib/sync",
+    "//zircon/public/lib/trace-driver",
+    "//zircon/public/lib/zircon-internal",
+    "//zircon/public/lib/zx",
+    "//zircon/system/banjo/ddk.protocol.block",
+    "//zircon/system/banjo/ddk.protocol.platform.device",
+  ]
+}
+
+test("sdmmc-test") {
+  # Dependent manifests unfortunately cannot be marked as `testonly`.
+  # Remove when converting this file to proper GN build idioms.
+  testonly = false
+  configs += [ "//build/unification/config:zircon-migrated" ]
+  output_name = "sdmmc-test"
+  sources = [
+    "fake-sdmmc-device.cc",
+    "mmc.cc",
+    "sdio-controller-device-test.cc",
+    "sdio-controller-device.cc",
+    "sdio-function-device.cc",
+    "sdmmc-block-device-test.cc",
+    "sdmmc-block-device.cc",
+    "sdmmc-device.cc",
+  ]
+  deps = [
+    "//sdk/banjo/ddk.protocol.block.partition",
+    "//sdk/banjo/ddk.protocol.sdio",
+    "//sdk/banjo/ddk.protocol.sdmmc",
+    "//zircon/public/lib/ddk",
+    "//zircon/public/lib/ddktl",
+    "//zircon/public/lib/dev-operation",
+    "//zircon/public/lib/fake_ddk",
+    "//zircon/public/lib/fzl",
+    "//zircon/public/lib/mock-function",
+    "//zircon/public/lib/pretty",
+    "//zircon/public/lib/sync",
+    "//zircon/public/lib/trace-driver",
+    "//zircon/public/lib/zircon-internal",
+    "//zircon/public/lib/zx",
+    "//zircon/public/lib/zxtest",
+    "//zircon/system/banjo/ddk.protocol.block",
+    "//zircon/system/banjo/ddk.protocol.platform.device",
+  ]
+}
+
+migrated_manifest("sdmmc-manifest") {
+  deps = [ ":sdmmc" ]
+}
+
+migrated_manifest("sdmmc-test-manifest") {
+  deps = [ ":sdmmc-test" ]
+}

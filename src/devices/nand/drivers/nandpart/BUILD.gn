@@ -1,0 +1,75 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/fuchsia/rules.gni")
+import("//build/test.gni")
+import("//build/unification/images/migrated_manifest.gni")
+
+driver_module("nandpart") {
+  defines = [ "_ALL_SOURCE" ]
+  configs += [ "//build/config/fuchsia:enable_zircon_asserts" ]
+  configs -= [ "//build/config/fuchsia:no_cpp_standard_library" ]
+  configs += [ "//build/config/fuchsia:static_cpp_standard_library" ]
+  configs += [ "//build/unification/config:zircon-migrated" ]
+  sources = [
+    "aml-bad-block.cc",
+    "bad-block.cc",
+    "nandpart-utils.cc",
+    "nandpart.cc",
+    "synaptics-bad-block.cc",
+  ]
+  deps = [
+    "//sdk/banjo/ddk.protocol.badblock",
+    "//sdk/banjo/ddk.protocol.nand",
+    "//src/devices/lib/driver",
+    "//zircon/public/lib/ddk",
+    "//zircon/public/lib/ddktl",
+    "//zircon/public/lib/dev-operation",
+    "//zircon/public/lib/fbl",
+    "//zircon/public/lib/sync",
+    "//zircon/public/lib/zircon-internal",
+    "//zircon/public/lib/zx",
+    "//zircon/system/fidl/fuchsia-hardware-nand:c",
+  ]
+}
+
+test("nandpart-test") {
+  # Dependent manifests unfortunately cannot be marked as `testonly`.
+  # TODO(44278): Remove when converting this file to proper GN build idioms.
+  testonly = false
+  configs += [ "//build/unification/config:zircon-migrated" ]
+  output_name = "nandpart-test"
+  sources = [
+    "aml-bad-block.cc",
+    "bad-block.cc",
+    "nandpart-utils.cc",
+    "synaptics-bad-block.cc",
+    "test/aml-bad-block-test.cc",
+    "test/nandpart-utils-test.cc",
+    "test/synaptics-bad-block-test.cc",
+  ]
+  include_dirs = [ "." ]
+  deps = [
+    "//sdk/banjo/ddk.protocol.nand",
+    "//zircon/public/lib/ddk",
+    "//zircon/public/lib/ddktl",
+    "//zircon/public/lib/fake_ddk",
+    "//zircon/public/lib/fbl",
+    "//zircon/public/lib/fdio",
+    "//zircon/public/lib/fzl",
+    "//zircon/public/lib/sync",
+    "//zircon/public/lib/zircon-internal",
+    "//zircon/public/lib/zx",
+    "//zircon/public/lib/zxtest",
+    "//zircon/system/fidl/fuchsia-hardware-nand:c",
+  ]
+}
+
+migrated_manifest("nandpart-manifest") {
+  deps = [ ":nandpart" ]
+}
+
+migrated_manifest("nandpart-test-manifest") {
+  deps = [ ":nandpart-test" ]
+}

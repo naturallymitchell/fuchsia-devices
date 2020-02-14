@@ -1,0 +1,66 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/fuchsia/rules.gni")
+import("//build/unification/images/migrated_manifest.gni")
+
+driver_module("zxcrypt") {
+  defines = [ "_ALL_SOURCE" ]
+  configs += [ "//build/config/fuchsia:enable_zircon_asserts" ]
+  configs -= [ "//build/config/fuchsia:no_cpp_standard_library" ]
+  configs += [ "//build/config/fuchsia:static_cpp_standard_library" ]
+  if (is_fuchsia) {
+    configs += [ "//build/unification/config:zircon-migrated" ]
+  }
+
+  sources = [
+    "device-info.cc",
+    "device-manager.cc",
+    "device.cc",
+    "extra.cc",
+    "worker.cc",
+  ]
+
+  configs += [ "//build/config/fuchsia:integer-paranoia" ]
+
+  # Until library loading is fully async, dynamically linking libraries can
+  # deadlock block device drviers. All dependencies for zxcrypt should be
+  # static or already linked by the devhost.  We consider libc, libzircon, and
+  # libdriver safe to depend on dynamically here.
+  deps = [
+    "//sdk/banjo/ddk.protocol.block.partition",
+    "//zircon/public/lib/bitmap",
+    "//zircon/public/lib/ddk",
+    "//zircon/public/lib/ddktl",
+    "//zircon/public/lib/fbl",
+    "//zircon/public/lib/pretty",
+    "//zircon/public/lib/sync",
+    "//zircon/public/lib/zircon-crypto-static",
+    "//zircon/public/lib/zx",
+    "//zircon/public/lib/zxcrypt-dev",
+    "//zircon/system/banjo/ddk.protocol.block",
+    "//zircon/system/banjo/ddk.protocol.block.volume",
+    "//zircon/system/fidl/fuchsia-hardware-block-encrypted:c",
+  ]
+
+  # Make sure we don't accidentally pull in a couple of easily-added dynamic
+  # library dependencies.
+  assert_no_deps = [
+    # This seems to get pulled in by //zircon/public/lib/driver, which is
+    # needed by //zircon/public/lib/zxcrypt-dev.  But happily it doesn't show
+    # up in our dynamically-linked shared libraries, so we're okay.
+    #"//zircon/public/lib/trace-engine",
+    "//zircon/public/lib/zircon-crypto",
+
+    # Some day, we'd also like to be able to assert we don't pull in fdio here,
+    # but it is pulled in transitively by //zircon/public/lib/driver, which is
+    # needed by //zircon/public/lib/zxcrypt-dev for the symbol
+    # |device_get_protocol|.
+    #"//zircon/public/lib/fdio",
+    "//zircon/public/lib/zxcrypt-fdio",
+  ]
+}
+migrated_manifest("zxcrypt-manifest") {
+  deps = [ ":zxcrypt" ]
+}

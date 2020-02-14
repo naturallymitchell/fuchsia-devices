@@ -1,0 +1,55 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/fuchsia/rules.gni")
+import("//build/unification/images/migrated_manifest.gni")
+
+driver_module("fvm") {
+  defines = [ "_ALL_SOURCE" ]
+  configs += [ "//build/config/fuchsia:enable_zircon_asserts" ]
+  configs -= [ "//build/config/fuchsia:no_cpp_standard_library" ]
+  configs += [ "//build/config/fuchsia:static_cpp_standard_library" ]
+  configs += [ "//build/unification/config:zircon-migrated" ]
+  deps = [
+    ":shared",
+    "//src/devices/lib/driver",
+  ]
+}
+
+# Also used by test/.
+source_set("shared") {
+  visibility = [ "./*" ]
+  defines = [ "_ALL_SOURCE" ]
+  sources = [
+    "fvm.c",
+    "fvm.cc",
+    "slice-extent.cc",
+    "vpartition.cc",
+  ]
+  public_deps = [
+    "//sdk/banjo/ddk.protocol.block.partition",
+    "//zircon/public/lib/boringssl",
+    "//zircon/public/lib/ddk",
+    "//zircon/public/lib/ddktl",
+    "//zircon/public/lib/digest",
+    "//zircon/public/lib/fbl",
+    "//zircon/public/lib/fidl-utils",
+    "//zircon/public/lib/fs",
+    "//zircon/public/lib/fvm",
+    "//zircon/public/lib/fzl",
+    "//zircon/public/lib/gpt",
+    "//zircon/public/lib/sync",
+    "//zircon/public/lib/zircon-internal",
+    "//zircon/public/lib/zx",
+    "//zircon/system/banjo/ddk.protocol.block",
+    "//zircon/system/banjo/ddk.protocol.block.volume",
+    "//zircon/system/fidl/fuchsia-hardware-block:c",
+    "//zircon/system/fidl/fuchsia-hardware-block-partition:c",
+    "//zircon/system/fidl/fuchsia-hardware-block-volume:c",
+  ]
+}
+
+migrated_manifest("fvm-manifest") {
+  deps = [ ":fvm" ]
+}
