@@ -5,12 +5,5 @@
 group("tests") {
   testonly = true
 
-  deps = [
-    "aml-sd-emmc:tests",
-    "mtk-sdmmc:tests",
-    "sdhci:tests",
-    "sdmmc:tests",
-    "usb-mass-storage:tests",
-    "virtio:virtio-block-test-package",
-  ]
+  deps = [ "drivers:tests" ]
 }
