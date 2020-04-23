@@ -1,0 +1,40 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+##########################################
+# Though under //zircon, this build file #
+# is meant to be used in the Fuchsia GN  #
+# build.                                 #
+# See fxb/36548.                         #
+##########################################
+
+assert(!defined(zx) || zx != "/",
+       "This file can only be used in the Fuchsia GN build.")
+
+import("//build/unification/zx_library.gni")
+
+zx_library("hisi") {
+  sdk = "source"
+  sdk_headers = [
+    "dev/clk/hisi-lib/hisi-gate.h",
+    "dev/clk/hisi-lib/hisi-clk.h",
+  ]
+  sources = [ "hisi-clk.cc" ]
+  public_deps = [
+    # <dev/clk/hisi-lib/hisi-clk.h> has #include <lib/mmio/mmio.h>.
+    "//zircon/public/lib/mmio",
+  ]
+  deps = [
+    "//sdk/banjo/ddk.protocol.clockimpl",
+    "//sdk/banjo/ddk.protocol.platform.bus",
+    "//sdk/banjo/ddk.protocol.platform.device",
+    "//src/devices/bus/lib/device-protocol-pdev",
+    "//src/devices/bus/lib/device-protocol-platform-device",
+    "//zircon/public/lib/ddk",
+    "//zircon/public/lib/ddktl",
+    "//zircon/public/lib/fbl",
+    "//zircon/public/lib/mmio",
+    "//zircon/public/lib/sync",
+  ]
+}
