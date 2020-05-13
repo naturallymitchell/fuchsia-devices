@@ -14,21 +14,12 @@ assert(!defined(zx) || zx != "/",
 
 import("//build/unification/zx_library.gni")
 
-zx_library("designware") {
-  sdk = "static"
-  sdk_headers = [
-    "dev/pci/designware/atu-cfg.h",
-    "dev/pci/designware/dw-pcie.h",
-  ]
-  sources = [ "dw-pcie.cc" ]
-  deps = [
-    "//src/devices/lib/driver",
-    "//src/devices/lib/mmio",
+zx_library("mmio") {
+  sdk = "source"
+  sdk_headers = [ "lib/mmio/mmio.h" ]
+  sources = []
+  public_deps = [
+    # <lib/mmio/mmio.h> has #include <fbl/macros.h>.
     "//zircon/public/lib/fbl",
-    "//zircon/public/lib/hwreg",
-    "//zircon/public/lib/sync",
-    "//zircon/public/lib/zx",
-    "//zircon/system/ulib/ddk",
-    "//zircon/system/ulib/ddktl",
   ]
 }
