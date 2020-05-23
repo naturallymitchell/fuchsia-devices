@@ -1,0 +1,50 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+##########################################
+# Though under //zircon, this build file #
+# is meant to be used in the Fuchsia GN  #
+# build.                                 #
+# See fxb/36139.                         #
+##########################################
+
+assert(!defined(zx) || zx != "/",
+       "This file can only be used in the Fuchsia GN build.")
+
+import("//build/test.gni")
+import("//build/test/test_package.gni")
+
+test("ramdisk") {
+  configs += [ "//build/unification/config:zircon-migrated" ]
+  sources = [ "ramdisk.cc" ]
+  deps = [
+    "//sdk/fidl/fuchsia.hardware.block:fuchsia.hardware.block_c",
+    "//sdk/fidl/fuchsia.hardware.block.partition:fuchsia.hardware.block.partition_c",
+    "//sdk/fidl/fuchsia.hardware.ramdisk:fuchsia.hardware.ramdisk_c",
+    "//zircon/public/lib/fbl",
+    "//zircon/public/lib/fdio",
+    "//zircon/public/lib/sync",
+    "//zircon/public/lib/zx",
+    "//zircon/system/fidl/fuchsia-io:c",
+    "//zircon/system/ulib/block-client",
+    "//zircon/system/ulib/devmgr-integration-test",
+    "//zircon/system/ulib/fdio-caller",
+    "//zircon/system/ulib/fs-management",
+    "//zircon/system/ulib/fzl",
+    "//zircon/system/ulib/ramdevice-client",
+    "//zircon/system/ulib/unittest",
+  ]
+}
+
+unittest_package("ramdisk-package") {
+  package_name = "ramdisk"
+  deps = [ ":ramdisk" ]
+
+  tests = [
+    {
+      name = "ramdisk"
+      dest = "ramdisk-test"
+    },
+  ]
+}
