@@ -1,0 +1,48 @@
+# Copyright 2020 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+##########################################
+# Though under //zircon, this build file #
+# is meant to be used in the Fuchsia GN  #
+# build.                                 #
+# See fxb/36139.                         #
+##########################################
+
+assert(!defined(zx) || zx != "/",
+       "This file can only be used in the Fuchsia GN build.")
+
+import("//build/test.gni")
+import("//build/test/test_package.gni")
+
+test("devcoordinator-namespace") {
+  if (is_fuchsia) {
+    configs += [ "//build/unification/config:zircon-migrated" ]
+  }
+  if (is_fuchsia) {
+    fdio_config = [ "//build/config/fuchsia:fdio_config" ]
+    if (configs + fdio_config - fdio_config != configs) {
+      configs -= fdio_config
+    }
+  }
+  sources = [ "namespace_test.cc" ]
+  deps = [
+    "//zircon/public/lib/fdio",
+    "//zircon/public/lib/zxtest",
+  ]
+
+  # TODO(46870): Fix the leaks and remove this.
+  deps += [ "//build/config/sanitizers:suppress-lsan.DO-NOT-USE-THIS" ]
+}
+
+unittest_package("devcoordinator-namespace-package") {
+  package_name = "devcoordinator-namespace"
+  deps = [ ":devcoordinator-namespace" ]
+
+  tests = [
+    {
+      name = "devcoordinator-namespace"
+      dest = "devcoordinator-namespace-test"
+    },
+  ]
+}
