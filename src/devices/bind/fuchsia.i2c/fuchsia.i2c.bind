@@ -8,3 +8,7 @@ extend uint fuchsia.BIND_PROTOCOL {
   I2C = 24,
   I2C_IMPL = 25,
 };
+
+extend uint fuchsia.BIND_I2C_CLASS {
+  HID = 0x01,
+};
