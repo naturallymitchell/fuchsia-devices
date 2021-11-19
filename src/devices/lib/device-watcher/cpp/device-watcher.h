@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SRC_DEVICES_LIB_DEVICE_WATCHER_CPP_DEVICE_WATCHER_H_
-#define SRC_DEVICES_LIB_DEVICE_WATCHER_CPP_DEVICE_WATCHER_H_
+#ifndef LIB_DEVICE_WATCHER_CPP_DEVICE_WATCHER_H_
+#define LIB_DEVICE_WATCHER_CPP_DEVICE_WATCHER_H_
 
 #include <lib/zx/channel.h>
 
@@ -60,4 +60,4 @@ class DirWatcher {
 
 }  // namespace device_watcher
 
-#endif  // SRC_DEVICES_LIB_DEVICE_WATCHER_CPP_DEVICE_WATCHER_H_
+#endif  // LIB_DEVICE_WATCHER_CPP_DEVICE_WATCHER_H_
